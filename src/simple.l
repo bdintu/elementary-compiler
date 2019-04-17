@@ -8,10 +8,12 @@ IS			(u|U|l|L)*
 
 %{
 #include "simple.tab.h"
+#include "string.h"
 
 void comment(); 
 %}
 
+%x SINGLE_STRING
 
 %%
 "const"             {return T_CONST;}
@@ -36,8 +38,21 @@ void comment();
 "\n"                {return T_NEWLINE;}
 
 {L}({L}|{D})*       {yylval.id = yytext[0]; return identifier;}
-[0-9]+              {yylval.num = atoi(yytext); return number;}
+[0-9]+              {yylval.num = atol(yytext); return T_INT;}
+0x{H}+              {yylval.num = (int)strtol(yytext, NULL, 0); return T_INT;}
 [-+*/=;()%]         {return yytext[0];}
+
+
+
+
+\"                          BEGIN(SINGLE_STRING);
+<SINGLE_STRING>{
+  ([^\\\"]|\\.)*            {yylval.num = strdup(yytext); return(T_STR);}
+  \"                        BEGIN(INITIAL);
+  .                         ;
+}
+
+
 [ \t\v\f]           {}
 "//"[^\n]*          {}
 "/*"                {comment();}

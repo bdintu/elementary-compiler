@@ -5,7 +5,7 @@
 extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
-extern int symbols[255];
+extern long symbols[255];
 int yyerror(const char *s);
 
 
@@ -18,7 +18,6 @@ int main() {
     yyin = stdin;
 
     do{
-        printf(">>> ");
         yyparse();         
     }while(!feof(yyin));
 
