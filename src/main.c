@@ -1,20 +1,18 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+
+extern void symbolsInit();
 extern int yylex();
 extern int yyparse();
 extern FILE* yyin;
-extern long symbols[255];
 int yyerror(const char *s);
 
 
 int main() {
-	int i;
-	for(i = 0 ; i < 255 ; i++) {
-		symbols[i] = 0;
-	}
-		
+    symbolsInit();
     yyin = stdin;
 
     do{

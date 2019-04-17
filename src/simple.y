@@ -2,11 +2,13 @@
 int yylex();
 #include <ctype.h>
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-long symbols[255];
+#include "hashmap.c"
+hashtable_t *symbols;
+
+void symbolsInit();
 long symbolVal(char symbol);
 void updateSymbolVal(char symbol, long val);
 %}
@@ -68,24 +70,19 @@ term: T_INT                {$$ = $1;}
 %%
 
 
-int computeSymbolIndex(char token) {
-	int idx = -1;
-	if(islower(token)) {
-		idx = token - 'a' + 26;
-	} else if(isupper(token)) {
-		idx = token - 'A';
-	}
-	return idx;
-} 
-
-
+void symbolsInit() {
+	symbols = ht_create( 65536 );
+}
+    
 long symbolVal(char symbol) {
-	int bucket = computeSymbolIndex(symbol);
-	return symbols[bucket];
+    char *p = malloc(sizeof(char));
+    *p = symbol;
+	return ht_get(symbols, p);
 }
 
-
 void updateSymbolVal(char symbol, long val) {
-	int bucket = computeSymbolIndex(symbol);
-	symbols[bucket] = val;
+    char *p = malloc(sizeof(char));
+    *p = symbol;
+	ht_set(symbols, p, val);
+    free(p);
 }
