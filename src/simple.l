@@ -1,0 +1,62 @@
+D			[0-9]
+L			[a-zA-Z_]
+H			[a-fA-F0-9]
+E			[Ee][+-]?{D}+
+FS			(f|F|l|L)
+IS			(u|U|l|L)*
+
+
+%{
+#include "simple.tab.h"
+
+void comment(); 
+%}
+
+
+%%
+"const"             {return T_CONST;}
+"else"              {return T_ELSE;}
+"exit"              {return T_EXIT;}
+"if"                {return T_IF;}
+"print"             {return T_PRINT;}
+"while"             {return T_WHILE;}
+
+"="                 {return T_ASSIGN;}
+"+"                 {return T_ADD;}
+"-"                 {return T_SUB;}
+"*"                 {return T_MUL;}
+"/"                 {return T_DIV;}
+"%"                 {return T_MOD;}
+"("                 {return T_LEFTPAREN;}
+")"                 {return T_RIGHTPAREN;}
+"{"                 {return T_OPENBRACE;}
+"}"                 {return T_CLOSEBRACE;}
+"["                 {return T_LEFTSQUARE;}
+"]"                 {return T_RIGHTSQUARE;}
+"\n"                {return T_NEWLINE;}
+
+{L}({L}|{D})*       {yylval.id = yytext[0]; return identifier;}
+[0-9]+              {yylval.num = atoi(yytext); return number;}
+[-+*/=;()%]         {return yytext[0];}
+[ \t\v\f]           {}
+"//"[^\n]*          {}
+"/*"                {comment();}
+%%
+
+
+int yywrap() {
+	return(1);
+}
+
+
+void comment() {
+	char c, c1;
+
+loop:
+	while ((c = input()) != '*' && c != 0) {}
+
+	if ((c1 = input()) != '/' && c != 0) {
+		unput(c1);
+		goto loop;
+	}
+}
