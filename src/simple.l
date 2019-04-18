@@ -23,6 +23,8 @@ void comment();
 "print"             {return T_PRINT;}
 "while"             {return T_WHILE;}
 
+"hex("             {return T_HEX;}
+
 "=="                {return T_EQ;}
 "!="                {return T_NE;}
 ">="                {return T_GT;}

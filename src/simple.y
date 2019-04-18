@@ -13,10 +13,12 @@ void symbolsInit();
 long symbolVal(char symbol);
 void updateSymbolVal(char symbol, long val);
 
-char* stringBuffer;
+char* sout[255], sbuffer[255];
+void printInit();
 void printStr();
 void addStr(char* str);
 void addInt(long ival);
+void addHex(long ival);
 %}
 
 
@@ -27,7 +29,7 @@ void addInt(long ival);
 
 %start start
 %token T_PRINT T_NEWLINE T_CONST
-%token T_IF T_ELSE T_WHILE T_COMMA
+%token T_IF T_ELSE T_WHILE T_COMMA T_HEX
 %token T_LEFTPAREN T_RIGHTPAREN T_OPENBRACE T_CLOSEBRACE T_LEFTSQUARE T_RIGHTSQUARE
 %token T_ADD T_SUB T_MUL T_DIV T_MOD
 %token T_EXIT T_ASSIGN T_EQ T_NE T_GT T_LT
@@ -81,8 +83,10 @@ condition: term
 
 stringformat: exp         {addInt($1);}
     | T_STR         {addStr($1);}
+    | T_HEX exp T_RIGHTPAREN         {addHex($2);}
     | exp T_COMMA stringformat   {addInt($1);}
     | T_STR T_COMMA stringformat   {addStr($1);}
+    | T_HEX exp T_RIGHTPAREN T_COMMA stringformat         {addHex($2);}
 
 exp: term                   {$$ = $1;}
 	| T_SUB exp 			{$$ = -$2; }
@@ -117,17 +121,26 @@ void updateSymbolVal(char symbol, long val) {
     free(p);
 }
 
-void printStr(char* str) {
-    printf("%s ", str);
-    stringBuffer = (char*)malloc(1024*sizeof(char));
+void printInit() {
+    strcpy(sout, "");
+    strcpy(sbuffer, "");
+}
+ 
+void printStr() {
+    printf("%s ", sout);
+    strcpy(sout, "");
 }
 
 void addStr(char* str) {
-    strcat(stringBuffer, str);
+    strcat(sout, str);
 }
+
 void addInt(long ival) {
-    char* str = malloc(255*sizeof(char));
-    sprintf(str, "%ld", ival);
-    strcat(stringBuffer, str);
-    free(str);
+    sprintf(sbuffer, "%ld", ival);
+    strcat(sout, sbuffer);
+}
+
+void addHex(long ival) {
+    sprintf(sbuffer, "0x%lx", ival);
+    strcat(sout, sbuffer);
 }
