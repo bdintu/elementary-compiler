@@ -41,6 +41,7 @@ void comment();
 "["                 {return T_LEFTSQUARE;}
 "]"                 {return T_RIGHTSQUARE;}
 "\n"                {return T_NEWLINE;}
+","                {return T_COMMA;}
 
 {L}({L}|{D})*       {yylval.id = yytext[0]; return identifier;}
 [0-9]+              {yylval.num = atol(yytext); return T_INT;}
@@ -54,7 +55,6 @@ void comment();
 <SINGLE_STRING>{
   ([^\\\"]|\\.)*            {yylval.num = strdup(yytext); return(T_STR);}
   \"                        BEGIN(INITIAL);
-  .                         ;
 }
 
 

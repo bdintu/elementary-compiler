@@ -12,6 +12,11 @@ hashtable_t *symbols;
 void symbolsInit();
 long symbolVal(char symbol);
 void updateSymbolVal(char symbol, long val);
+
+char* stringBuffer;
+void printStr();
+void addStr(char* str);
+void addInt(long ival);
 %}
 
 
@@ -22,7 +27,7 @@ void updateSymbolVal(char symbol, long val);
 
 %start start
 %token T_PRINT T_NEWLINE T_CONST
-%token T_IF T_ELSE T_WHILE
+%token T_IF T_ELSE T_WHILE T_COMMA
 %token T_LEFTPAREN T_RIGHTPAREN T_OPENBRACE T_CLOSEBRACE T_LEFTSQUARE T_RIGHTSQUARE
 %token T_ADD T_SUB T_MUL T_DIV T_MOD
 %token T_EXIT T_ASSIGN T_EQ T_NE T_GT T_LT
@@ -30,10 +35,10 @@ void updateSymbolVal(char symbol, long val);
 %token <id> identifier
 
 %left T_MUL T_DIV T_MOD T_ADD T_SUB
-%left T_IF T_ELSE
+%left T_IF T_ELSE T_WHILE
 %left T_EQ T_NE T_GT T_LT
 
-%type <num> stmt exp term condition
+%type <num> stmt exp term condition stringformat
 %type <id> assig const_assig
 
 
@@ -48,7 +53,7 @@ stmt: T_NEWLINE                 {}
     | T_EXIT T_NEWLINE          {exit(0); }
     | T_PRINT term T_NEWLINE    {printf("%ld", $2);}
     | T_PRINT exp T_NEWLINE     {printf("%ld", $2);}
-    | T_PRINT T_STR T_NEWLINE   {printf("%s", (char*)($2));}
+    | T_PRINT stringformat T_NEWLINE   {printStr();}
     | ifelse T_NEWLINE          {}
     | whileloop T_NEWLINE          {}
     ;
@@ -73,6 +78,11 @@ condition: term
 	| exp T_EQ exp          {$$ = $1 == $3? 1: 0;}
 	| exp T_NE exp          {$$ = $1 != $3? 1: 0;}
     ;
+
+stringformat: exp         {addInt($1);}
+    | T_STR         {addStr($1);}
+    | exp T_COMMA stringformat   {addInt($1);}
+    | T_STR T_COMMA stringformat   {addStr($1);}
 
 exp: term                   {$$ = $1;}
 	| T_SUB exp 			{$$ = -$2; }
@@ -105,4 +115,19 @@ void updateSymbolVal(char symbol, long val) {
     *p = symbol;
 	ht_set(symbols, p, val);
     free(p);
+}
+
+void printStr(char* str) {
+    printf("%s ", str);
+    stringBuffer = (char*)malloc(1024*sizeof(char));
+}
+
+void addStr(char* str) {
+    strcat(stringBuffer, str);
+}
+void addInt(long ival) {
+    char* str = malloc(255*sizeof(char));
+    sprintf(str, "%ld", ival);
+    strcat(stringBuffer, str);
+    free(str);
 }
