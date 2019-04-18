@@ -132,15 +132,18 @@ void printStr() {
 }
 
 void addStr(char* str) {
-    strcat(sout, str);
+    char *tmp = strdup(sout);
+    strcpy(sout, str);
+    strcat(sout, tmp);
+    free(tmp);
 }
 
 void addInt(long ival) {
     sprintf(sbuffer, "%ld", ival);
-    strcat(sout, sbuffer);
+    addStr(sbuffer);
 }
 
 void addHex(long ival) {
     sprintf(sbuffer, "0x%lx", ival);
-    strcat(sout, sbuffer);
+    addStr(sbuffer);
 }
