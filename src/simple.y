@@ -1,4 +1,5 @@
 %{
+
 int yylex();
 #include <ctype.h>
 #include <stdio.h>
@@ -24,13 +25,15 @@ void updateSymbolVal(char symbol, long val);
 %token T_IF T_ELSE T_WHILE
 %token T_LEFTPAREN T_RIGHTPAREN T_OPENBRACE T_CLOSEBRACE T_LEFTSQUARE T_RIGHTSQUARE
 %token T_ADD T_SUB T_MUL T_DIV T_MOD
-%token T_EXIT T_ASSIGN
+%token T_EXIT T_ASSIGN T_EQ T_NE T_GT T_LT
 %token <num> T_INT T_STR
 %token <id> identifier
 
 %left T_MUL T_DIV T_MOD T_ADD T_SUB
+%left T_IF T_ELSE
+%left T_EQ T_NE T_GT T_LT
 
-%type <num> stmt exp term 
+%type <num> stmt exp term condition
 %type <id> assig const_assig
 
 
@@ -45,7 +48,9 @@ stmt: T_NEWLINE                 {}
     | T_EXIT T_NEWLINE          {exit(0); }
     | T_PRINT term T_NEWLINE    {printf("%ld", $2);}
     | T_PRINT exp T_NEWLINE     {printf("%ld", $2);}
-    | T_PRINT T_STR T_NEWLINE     {printf("%s", (char*)($2));}
+    | T_PRINT T_STR T_NEWLINE   {printf("%s", (char*)($2));}
+    | ifelse T_NEWLINE          {}
+    | whileloop T_NEWLINE          {}
     ;
 
 assig: identifier T_ASSIGN exp  { updateSymbolVal($1,$3);}
@@ -54,8 +59,23 @@ assig: identifier T_ASSIGN exp  { updateSymbolVal($1,$3);}
 const_assig: identifier T_ASSIGN exp  { updateSymbolVal($1,$3);}
     ;
 
-exp: term                  {$$ = $1;}
-	| T_SUB exp 				{$$ = - $2; }
+ifelse: T_IF condition T_OPENBRACE exp T_CLOSEBRACE {}
+    | T_IF condition T_OPENBRACE exp T_CLOSEBRACE T_ELSE ifelse {}
+    | T_IF condition T_OPENBRACE exp T_CLOSEBRACE T_ELSE T_OPENBRACE exp T_CLOSEBRACE {}
+    ;
+
+whileloop: T_WHILE condition T_OPENBRACE exp T_CLOSEBRACE {}
+    ;
+
+condition: term
+    | exp T_GT exp           {$$ =  $1 > $3? 1: 0;}
+	| exp T_LT exp           {$$ =  $1 < $3? 1: 0;}
+	| exp T_EQ exp          {$$ = $1 == $3? 1: 0;}
+	| exp T_NE exp          {$$ = $1 != $3? 1: 0;}
+    ;
+
+exp: term                   {$$ = $1;}
+	| T_SUB exp 			{$$ = -$2; }
     | T_LEFTPAREN exp T_RIGHTPAREN		{$$ = $2;}
     | exp T_MUL exp         {$$ = $1 * $3;}
 	| exp T_DIV exp         {$$ = $1 / $3;}

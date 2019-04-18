@@ -23,6 +23,11 @@ void comment();
 "print"             {return T_PRINT;}
 "while"             {return T_WHILE;}
 
+"=="                {return T_EQ;}
+"!="                {return T_NE;}
+">="                {return T_GT;}
+"<="                {return T_LT;}
+
 "="                 {return T_ASSIGN;}
 "+"                 {return T_ADD;}
 "-"                 {return T_SUB;}
@@ -40,7 +45,7 @@ void comment();
 {L}({L}|{D})*       {yylval.id = yytext[0]; return identifier;}
 [0-9]+              {yylval.num = atol(yytext); return T_INT;}
 0x{H}+              {yylval.num = (int)strtol(yytext, NULL, 0); return T_INT;}
-[-+*/=;()%]         {return yytext[0];}
+[-+*/=><;(){}[]%]         {return yytext[0];}
 
 
 
