@@ -8,10 +8,17 @@ int yylex();
 
 #include "hashmap.c"
 hashtable_t *symbols;
+char* iden_name[255];
 
 void symbolsInit();
-long symbolVal(char symbol);
-void updateSymbolVal(char symbol, long val);
+void createSymbol(char* symbol, long val, int is_const);
+void updateSymbol(char* symbol, long val);
+long readSymbol(char* symbol);
+
+
+void createArray(char* symbol, int size);
+void updateArray(char* symbol, int index, long val);
+long readArray(char* symbol, int index);
 
 char* sout[255], sbuffer[255];
 void printInit();
@@ -24,12 +31,12 @@ void addHex(long ival);
 
 %union {
     long num;
-    char id;
+    char* id;
 }
 
 %start start
 %token T_PRINT T_NEWLINE T_CONST
-%token T_IF T_ELSE T_WHILE T_COMMA T_HEX
+%token T_IF T_ELSE T_WHILE T_COMMA T_SEMI T_HEX
 %token T_LEFTPAREN T_RIGHTPAREN T_OPENBRACE T_CLOSEBRACE T_LEFTSQUARE T_RIGHTSQUARE
 %token T_ADD T_SUB T_MUL T_DIV T_MOD
 %token T_EXIT T_ASSIGN T_EQ T_NE T_GT T_LT
@@ -41,7 +48,7 @@ void addHex(long ival);
 %left T_EQ T_NE T_GT T_LT
 
 %type <num> stmt exp term condition stringformat
-%type <id> assig const_assig
+%type <id> assign const_assign
 
 
 %%
@@ -50,43 +57,47 @@ start:
     ;
 
 stmt: T_NEWLINE                 {}
-    | T_CONST const_assig T_NEWLINE      {}
-    | assig T_NEWLINE      {}
-    | T_EXIT T_NEWLINE          {exit(0); }
-    | T_PRINT term T_NEWLINE    {printf("%ld", $2);}
-    | T_PRINT exp T_NEWLINE     {printf("%ld", $2);}
-    | T_PRINT stringformat T_NEWLINE   {printStr();}
-    | ifelse T_NEWLINE          {}
-    | whileloop T_NEWLINE          {}
+    | T_CONST const_assign       {}
+    | assign                     {}
+    | T_EXIT                    {exit(0);}
+    | T_PRINT term              {printf("%ld", $2);}
+    | T_PRINT exp               {printf("%ld", $2);}
+    | T_PRINT stringformat      {printStr();}
+    | ifelse                    {}
+    | whileloop                 {}
+    | stmt T_SEMI stmt          {}
+    | stmt T_SEMI stmt T_SEMI   {}
     ;
 
-assig: identifier T_ASSIGN exp  { updateSymbolVal($1,$3);}
+assign: identifier T_ASSIGN exp  { createSymbol($1,$3,0);}
+    | identifier T_LEFTSQUARE exp T_RIGHTSQUARE T_ASSIGN T_OPENBRACE T_CLOSEBRACE   { createArray($1,$3);}
+    | identifier T_LEFTSQUARE exp T_RIGHTSQUARE T_ASSIGN exp                        { updateArray($1,$3,$6);}
     ;
 
-const_assig: identifier T_ASSIGN exp  { updateSymbolVal($1,$3);}
+const_assign: identifier T_ASSIGN exp  { createSymbol($1,$3,1);}
     ;
 
-ifelse: T_IF condition T_OPENBRACE exp T_CLOSEBRACE {}
-    | T_IF condition T_OPENBRACE exp T_CLOSEBRACE T_ELSE ifelse {}
-    | T_IF condition T_OPENBRACE exp T_CLOSEBRACE T_ELSE T_OPENBRACE exp T_CLOSEBRACE {}
+ifelse: T_IF condition T_OPENBRACE stmt T_CLOSEBRACE {}
+    | T_IF condition T_OPENBRACE stmt T_CLOSEBRACE T_ELSE ifelse {}
+    | T_IF condition T_OPENBRACE stmt T_CLOSEBRACE T_ELSE T_OPENBRACE stmt T_CLOSEBRACE {}
     ;
 
-whileloop: T_WHILE condition T_OPENBRACE exp T_CLOSEBRACE {}
+whileloop: T_WHILE condition T_OPENBRACE stmt T_CLOSEBRACE {}
     ;
 
 condition: term
-    | exp T_GT exp           {$$ =  $1 > $3? 1: 0;}
-	| exp T_LT exp           {$$ =  $1 < $3? 1: 0;}
+    | exp T_GT exp          {$$ =  $1 > $3? 1: 0;}
+	| exp T_LT exp          {$$ =  $1 < $3? 1: 0;}
 	| exp T_EQ exp          {$$ = $1 == $3? 1: 0;}
 	| exp T_NE exp          {$$ = $1 != $3? 1: 0;}
     ;
 
-stringformat: exp         {addInt($1);}
-    | T_STR         {addStr($1);}
-    | T_HEX exp T_RIGHTPAREN         {addHex($2);}
-    | exp T_COMMA stringformat   {addInt($1);}
-    | T_STR T_COMMA stringformat   {addStr($1);}
-    | T_HEX exp T_RIGHTPAREN T_COMMA stringformat         {addHex($2);}
+stringformat: exp                   {addInt($1);}
+    | T_STR                         {addStr($1);}
+    | T_HEX exp T_RIGHTPAREN        {addHex($2);}
+    | exp T_COMMA stringformat      {addInt($1);}
+    | T_STR T_COMMA stringformat    {addStr($1);}
+    | T_HEX exp T_RIGHTPAREN T_COMMA stringformat   {addHex($2);}
 
 exp: term                   {$$ = $1;}
 	| T_SUB exp 			{$$ = -$2; }
@@ -98,8 +109,9 @@ exp: term                   {$$ = $1;}
     | exp T_SUB exp         {$$ = $1 - $3;}
     ;
 
-term: T_INT                {$$ = $1;}
-    | identifier			{$$ = symbolVal($1);} 
+term: T_INT                 {$$ = $1;}
+    | identifier			{$$ = readSymbol($1);} 
+    | identifier T_LEFTSQUARE exp T_RIGHTSQUARE   {$$ = readArray($1,$3);} 
     ;
 %%
 
@@ -107,18 +119,38 @@ term: T_INT                {$$ = $1;}
 void symbolsInit() {
 	symbols = ht_create( 65536 );
 }
+
+
+void createSymbol(char* symbol, long val, int is_const) {
+
+}
     
-long symbolVal(char symbol) {
-    char *p = malloc(sizeof(char));
-    *p = symbol;
-	return ht_get(symbols, p);
+void updateSymbol(char* symbol, long val) {
+    strcpy(iden_name, symbol);
+	ht_set(symbols, iden_name, val);
+
+    long fff = ht_get(symbols, iden_name);
 }
 
-void updateSymbolVal(char symbol, long val) {
-    char *p = malloc(sizeof(char));
-    *p = symbol;
-	ht_set(symbols, p, val);
-    free(p);
+long readSymbol(char* symbol) {
+    strcpy(iden_name, symbol);
+	return ht_get(symbols, iden_name);
+}
+
+void createArray(char* symbol, int size) {
+
+}
+    
+void updateArray(char* symbol, int index, long val) {
+    strcpy(iden_name, symbol);
+	ht_set(symbols, iden_name, val);
+
+    long fff = ht_get(symbols, iden_name);
+}
+
+long readArray(char* symbol, int index) {
+    strcpy(iden_name, symbol);
+	return ht_get(symbols, iden_name);
 }
 
 void printInit() {
