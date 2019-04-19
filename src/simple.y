@@ -6,9 +6,8 @@ int yylex();
 #include <stdlib.h>
 #include <string.h>
 
-#include "hashmap.c"
-hashtable_t *symbols;
-char* iden_name[255];
+#include "map.h"
+map_long_t m;
 
 void symbolsInit();
 void createSymbol(char* symbol, long val, int is_const);
@@ -16,6 +15,7 @@ void updateSymbol(char* symbol, long val);
 long readSymbol(char* symbol);
 
 
+char* arrayname[255];
 void createArray(char* symbol, int size);
 void updateArray(char* symbol, int index, long val);
 long readArray(char* symbol, int index);
@@ -117,40 +117,53 @@ term: T_INT                 {$$ = $1;}
 
 
 void symbolsInit() {
-	symbols = ht_create( 65536 );
+    map_init(&m);
 }
 
 
 void createSymbol(char* symbol, long val, int is_const) {
-
+    map_set(&m, symbol, val);
 }
     
 void updateSymbol(char* symbol, long val) {
-    strcpy(iden_name, symbol);
-	ht_set(symbols, iden_name, val);
-
-    long fff = ht_get(symbols, iden_name);
+    map_set(&m, symbol, val);
 }
 
 long readSymbol(char* symbol) {
-    strcpy(iden_name, symbol);
-	return ht_get(symbols, iden_name);
+    long *val = map_get(&m, symbol);
+    if (val) {
+        return *val;
+    } else {
+        yyerror("not found!");
+    }
+}
+
+void genArrayName(char* symbol, int index) {
+    sprintf(arrayname, "%d", index);
+    strcat(arrayname, symbol);
 }
 
 void createArray(char* symbol, int size) {
-
+    for (int i=0; i<size; ++i) {
+        genArrayName(symbol, i);
+        map_set(&m, arrayname, 0);
+    }
 }
     
 void updateArray(char* symbol, int index, long val) {
-    strcpy(iden_name, symbol);
-	ht_set(symbols, iden_name, val);
-
-    long fff = ht_get(symbols, iden_name);
+    genArrayName(symbol, index);
+    map_set(&m, arrayname, val);
 }
 
 long readArray(char* symbol, int index) {
-    strcpy(iden_name, symbol);
-	return ht_get(symbols, iden_name);
+    genArrayName(symbol, index);
+    long *val = map_get(&m, arrayname);
+    if (val) {
+        return *val;
+    } else {
+        yyerror("not found!");
+    }
+
 }
 
 void printInit() {
