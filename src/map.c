@@ -13,6 +13,8 @@ struct map_node_t {
   unsigned hash;
   void *value;
   map_node_t *next;
+
+  int is_const;
   /* char key[]; */
   /* char value[]; */
 };
@@ -27,7 +29,7 @@ static unsigned map_hash(const char *str) {
 }
 
 
-static map_node_t *map_newnode(const char *key, void *value, int vsize) {
+static map_node_t *map_newnode(const char *key, void *value, int vsize, int is_const) {
   map_node_t *node;
   int ksize = strlen(key) + 1;
   int voffset = ksize + ((sizeof(void*) - ksize) % sizeof(void*));
@@ -37,6 +39,7 @@ static map_node_t *map_newnode(const char *key, void *value, int vsize) {
   node->hash = map_hash(key);
   node->value = ((char*) (node + 1)) + voffset;
   memcpy(node->value, value, vsize);
+  node->is_const = is_const;
   return node;
 }
 
@@ -129,8 +132,12 @@ void *map_get_(map_base_t *m, const char *key) {
   return next ? (*next)->value : NULL;
 }
 
+int map_get_isconst_(map_base_t *m, const char *key) {
+  map_node_t **next = map_getref(m, key);
+  return next ? (*next)->is_const : 0;
+}
 
-int map_set_(map_base_t *m, const char *key, void *value, int vsize) {
+int map_set_(map_base_t *m, const char *key, void *value, int vsize, int is_const) {
   int n, err;
   map_node_t **next, *node;
   /* Find & replace existing node */
@@ -140,7 +147,7 @@ int map_set_(map_base_t *m, const char *key, void *value, int vsize) {
     return 0;
   }
   /* Add new node */
-  node = map_newnode(key, value, vsize);
+  node = map_newnode(key, value, vsize, is_const);
   if (node == NULL) goto fail;
   if (m->nnodes >= m->nbuckets) {
     n = (m->nbuckets > 0) ? (m->nbuckets << 1) : 1;

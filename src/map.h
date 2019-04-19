@@ -41,10 +41,13 @@ typedef struct {
 #define map_get(m, key)\
   ( (m)->ref = map_get_(&(m)->base, key) )
 
+#define map_get_isconst(m, key)\
+  ( (m)->ref = map_get_isconst_(&(m)->base, key) )
 
-#define map_set(m, key, value)\
+
+#define map_set(m, key, value, is_const)\
   ( (m)->tmp = (value),\
-    map_set_(&(m)->base, key, &(m)->tmp, sizeof((m)->tmp)) )
+    map_set_(&(m)->base, key, &(m)->tmp, sizeof((m)->tmp), is_const) )
 
 
 #define map_remove(m, key)\
@@ -61,7 +64,8 @@ typedef struct {
 
 void map_deinit_(map_base_t *m);
 void *map_get_(map_base_t *m, const char *key);
-int map_set_(map_base_t *m, const char *key, void *value, int vsize);
+int map_get_isconst_(map_base_t *m, const char *key);
+int map_set_(map_base_t *m, const char *key, void *value, int vsize, int is_const);
 void map_remove_(map_base_t *m, const char *key);
 map_iter_t map_iter_(void);
 const char *map_next_(map_base_t *m, map_iter_t *iter);

@@ -1,18 +1,1 @@
 print "Hello, world\n"
-
-const PI = 3
-print PI
-print "\n"
-
-x = 7
-x = 4 + 10*x
-print x
-print "\n"
-
-y = 0x4a
-print y
-print "\n"
-
-INT_MAX = 9223372036854775807
-print INT_MAX
-print "\n"

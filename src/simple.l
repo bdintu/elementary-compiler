@@ -17,10 +17,12 @@ void comment();
 
 %%
 "const"             {return T_CONST;}
+"del"               {return T_DEL;}
 "else"              {return T_ELSE;}
 "exit"              {return T_EXIT;}
 "if"                {return T_IF;}
 "print"             {return T_PRINT;}
+"var"               {return T_VAR;}
 "while"             {return T_WHILE;}
 
 "hex("              {return T_HEX;}

@@ -1,0 +1,7 @@
+var x
+var y
+
+x = 7
+y = 4 + 10*x
+
+print y

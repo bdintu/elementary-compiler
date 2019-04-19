@@ -35,7 +35,7 @@ void addHex(long ival);
 }
 
 %start start
-%token T_PRINT T_NEWLINE T_CONST
+%token T_PRINT T_NEWLINE T_CONST T_VAR T_DEL
 %token T_IF T_ELSE T_WHILE T_COMMA T_SEMI T_HEX
 %token T_LEFTPAREN T_RIGHTPAREN T_OPENBRACE T_CLOSEBRACE T_LEFTSQUARE T_RIGHTSQUARE
 %token T_ADD T_SUB T_MUL T_DIV T_MOD
@@ -48,7 +48,7 @@ void addHex(long ival);
 %left T_EQ T_NE T_GT T_LT
 
 %type <num> stmt exp term condition stringformat
-%type <id> assign const_assign
+%type <id> assign update
 
 
 %%
@@ -57,8 +57,8 @@ start:
     ;
 
 stmt: T_NEWLINE                 {}
-    | T_CONST const_assign       {}
     | assign                     {}
+    | update                     {}
     | T_EXIT                    {exit(0);}
     | T_PRINT term              {printf("%ld", $2);}
     | T_PRINT exp               {printf("%ld", $2);}
@@ -69,12 +69,14 @@ stmt: T_NEWLINE                 {}
     | stmt T_SEMI stmt T_SEMI   {}
     ;
 
-assign: identifier T_ASSIGN exp  { createSymbol($1,$3,0);}
-    | identifier T_LEFTSQUARE exp T_RIGHTSQUARE T_ASSIGN T_OPENBRACE T_CLOSEBRACE   { createArray($1,$3);}
-    | identifier T_LEFTSQUARE exp T_RIGHTSQUARE T_ASSIGN exp                        { updateArray($1,$3,$6);}
+assign: T_CONST identifier T_ASSIGN exp  { createSymbol($2,$4,1);}
+    | T_VAR identifier  { createSymbol($2,0,0);}
+    | T_VAR identifier T_ASSIGN exp  { createSymbol($2,$4,0);}
+    | T_VAR identifier T_LEFTSQUARE exp T_RIGHTSQUARE { createArray($2,$4);}
     ;
 
-const_assign: identifier T_ASSIGN exp  { createSymbol($1,$3,1);}
+update: identifier T_ASSIGN exp {updateSymbol($1,$3);}
+    | identifier T_LEFTSQUARE exp T_RIGHTSQUARE T_ASSIGN exp { updateArray($1,$3,$6);}
     ;
 
 ifelse: T_IF condition T_OPENBRACE stmt T_CLOSEBRACE {}
@@ -120,13 +122,20 @@ void symbolsInit() {
     map_init(&m);
 }
 
-
 void createSymbol(char* symbol, long val, int is_const) {
-    map_set(&m, symbol, val);
+    map_set(&m, symbol, val, is_const);
 }
     
 void updateSymbol(char* symbol, long val) {
-    map_set(&m, symbol, val);
+
+    long test = readSymbol(symbol);
+    
+    int is_const = map_get_isconst(&m, symbol);
+    if (is_const) {
+        yyerror("var is const");
+    } else {
+        map_set(&m, symbol, val, 0);
+    }
 }
 
 long readSymbol(char* symbol) {
@@ -146,24 +155,18 @@ void genArrayName(char* symbol, int index) {
 void createArray(char* symbol, int size) {
     for (int i=0; i<size; ++i) {
         genArrayName(symbol, i);
-        map_set(&m, arrayname, 0);
+        createSymbol(arrayname, 0, 0);
     }
 }
     
 void updateArray(char* symbol, int index, long val) {
     genArrayName(symbol, index);
-    map_set(&m, arrayname, val);
+    updateSymbol(arrayname, val);
 }
 
 long readArray(char* symbol, int index) {
     genArrayName(symbol, index);
-    long *val = map_get(&m, arrayname);
-    if (val) {
-        return *val;
-    } else {
-        yyerror("not found!");
-    }
-
+    return readSymbol(arrayname);
 }
 
 void printInit() {

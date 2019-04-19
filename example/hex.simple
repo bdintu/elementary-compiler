@@ -1,0 +1,4 @@
+var ninetynine = 99
+var hex = 0xf
+
+print hex(ninetynine), hex
