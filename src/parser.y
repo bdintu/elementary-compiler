@@ -6,7 +6,7 @@ int yylex();
 #include <stdlib.h>
 #include <string.h>
 
-#include "map.h"
+#include "map.c"
 map_long_t m;
 
 void symbolsInit();

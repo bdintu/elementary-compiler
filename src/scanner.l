@@ -7,7 +7,7 @@ IS			(u|U|l|L)*
 
 
 %{
-#include "simple.tab.h"
+#include "parser.tab.h"
 #include "string.h"
 
 void comment(); 
