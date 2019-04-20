@@ -6,6 +6,7 @@ int yylex();
 #include <stdlib.h>
 #include <string.h>
 
+#include "replacestring.c"
 #include "map.c"
 map_long_t m;
 
@@ -187,9 +188,11 @@ void printStr() {
 
 void addStr(char* str) {
     char *tmp = strdup(sout);
-    strcpy(sout, str);
+    char *result = replaceString(str, "\\n", "\n");
+    strcpy(sout, result);
     strcat(sout, tmp);
     free(tmp);
+    free(result);
 }
 
 void addInt(long ival) {
