@@ -47,7 +47,7 @@ void addHex(long ival);
 %left T_IF T_ELSE T_WHILE
 %left T_EQ T_NE T_GT T_LT
 
-%type <num> stmt exp term condition stringformat
+%type <num> stmt exp exp2 exp3 term condition stringformat
 %type <id> assign update
 
 
@@ -103,12 +103,18 @@ stringformat: exp                   {addInt($1);}
 
 exp: term                   {$$ = $1;}
 	| T_SUB exp 			{$$ = -$2; }
+    | exp T_ADD exp2         {$$ = $1 + $3;}
+    | exp T_SUB exp2         {$$ = $1 - $3;}
+    ;
+
+exp2: term                   {$$ = $1;}
+    | exp T_MUL exp3         {$$ = $1 * $3;}
+	| exp T_DIV exp3         {$$ = $1 / $3;}
+	| exp T_MOD exp2         {$$ = $1 % $3;}
+    ;
+
+exp3: term                   {$$ = $1;}
     | T_LEFTPAREN exp T_RIGHTPAREN		{$$ = $2;}
-    | exp T_MUL exp         {$$ = $1 * $3;}
-	| exp T_DIV exp         {$$ = $1 / $3;}
-	| exp T_MOD exp         {$$ = $1 % $3;}
-    | exp T_ADD exp         {$$ = $1 + $3;}
-    | exp T_SUB exp         {$$ = $1 - $3;}
     ;
 
 term: T_INT                 {$$ = $1;}
