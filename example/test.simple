@@ -1,0 +1,40 @@
+const MI = 9223372036854775807
+print "MAX INT: "
+print MI
+print "\n"
+
+var IN = -8+0x64/(4/2)
+print "-8+0x64/(4/2): "
+print hex(IN)
+print "\n"
+
+var FM = 2
+var TO = 0x64
+print "Prime number from 1 to "
+print TO
+print ": "
+
+var PR[25]
+var ID = 0
+
+var PM = 0
+var ST = 2
+
+for FM : TO {
+    PM = 0; ST = 2
+	for ST : FM {
+		if FM % ST == 0 {
+			PM = 1
+		}
+	}
+	if PM == 0 {
+        PR[ID] = FM
+        ID = ID + 1
+	}
+}
+
+ID = 0
+for ID : 25 {
+    print PR[ID]
+    print " "
+}

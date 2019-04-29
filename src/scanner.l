@@ -1,78 +1,57 @@
-D			[0-9]
-L			[a-zA-Z_]
-H			[a-fA-F0-9]
-E			[Ee][+-]?{D}+
-FS			(f|F|l|L)
-IS			(u|U|l|L)*
-
+%option noyywrap nodefault yylineno
 
 %{
-#include "parser.tab.h"
-#include "string.h"
+  #include "asmgen.h"
+  #include "node.h"
+  #include "parser.tab.h"
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <math.h>
+  #include <ctype.h>
+  #include <string.h>
 
-void comment(); 
+  extern int errorflag;
 %}
 
-%x SINGLE_STRING
-
 %%
-"const"             {return T_CONST;}
-"del"               {return T_DEL;}
-"else"              {return T_ELSE;}
-"exit"              {return T_EXIT;}
-"if"                {return T_IF;}
-"print"             {return T_PRINT;}
-"var"               {return T_VAR;}
-"while"             {return T_WHILE;}
-
-"hex("              {return T_HEX;}
-
-"=="                {return T_EQ;}
-"!="                {return T_NE;}
-">="                {return T_GT;}
-"<="                {return T_LT;}
-
-"="                 {return T_ASSIGN;}
-"+"                 {return T_ADD;}
-"-"                 {return T_SUB;}
-"*"                 {return T_MUL;}
-"/"                 {return T_DIV;}
-"%"                 {return T_MOD;}
-"("                 {return T_LEFTPAREN;}
-")"                 {return T_RIGHTPAREN;}
-"{"                 {return T_OPENBRACE;}
-"}"                 {return T_CLOSEBRACE;}
-"["                 {return T_LEFTSQUARE;}
-"]"                 {return T_RIGHTSQUARE;}
-"\n"                {return T_NEWLINE;}
-","                 {return T_COMMA;}
-";"                 {return T_SEMI;}
-
-{L}({L}|{D})*       {yylval.id = strdup(yytext); return identifier;}
-[0-9]+              {yylval.num = atol(yytext); return T_INT;}
-0x{H}+              {yylval.num = (int)strtol(yytext, NULL, 0); return T_INT;}
-[-+*/=><;(){}[]%]         {return yytext[0];}
-
-
-
-
-\"                          BEGIN(SINGLE_STRING);
-<SINGLE_STRING>{
-  ([^\\\"]|\\.)*            {yylval.num = strdup(yytext); return(T_STR);}
-  \"                        BEGIN(INITIAL);
-}
-
-
 [ \t\v\f]           {}
 "//"[^\n]*          {}
 "/*"                {comment();}
+[-]*[0-9]+           { yylval.num = (int64_t)atol(yytext); return (NUM); }
+0[xX][0-9a-fA-F]+  { yylval.num = (int64_t)strtol(yytext, NULL, 0); return (NUM);}
+[A-Z][A-Z]     { yylval.sym = lookup(yytext, 0, 0); return (VAR); }
+["].*["]          { yylval.str = strdup(yytext); return (TEXT); }
+"="              { return (TK_ASSIGN); }
+"(" |
+")" |
+"[" |
+"]" |
+"{" |
+"}" |
+"+" |
+"-" |
+"*" |
+"/" |
+"%" |
+"^" |
+":" |
+";" |
+","               { return (yytext[0]); }
+"=="          { return (TK_EQ); }
+"!="          { return (TK_NE); }
+">="          { return (TK_GE); }
+"<="          { return (TK_LE); }
+">"          { return (TK_GT); }
+"<"          { return (TK_LT); }
+"print"          { return (TK_PRINT); }
+"hex"          { return (TK_HEX); }
+"const"          { return (TK_CONST); }
+"var"          { return (TK_VAR); }
+"if"             { return (TK_IFE); }
+"for"             { return (TK_VON); }
+\n                {  }
+.                 { errorflag = 1; yyerror("Mystery character %c\n", *yytext); }
 %%
-
-
-int yywrap() {
-	return(1);
-}
-
 
 void comment() {
 	char c, c1;

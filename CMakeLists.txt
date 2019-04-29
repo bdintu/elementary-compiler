@@ -9,4 +9,4 @@ BISON_TARGET(Parser src/parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.c)
 ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} include)
-add_executable(simple ${BISON_Parser_OUTPUTS} ${FLEX_Scanner_OUTPUTS} src/main.c)
+add_executable(simple ${BISON_Parser_OUTPUTS} ${FLEX_Scanner_OUTPUTS} src/main.c src/asmutil.c)
