@@ -1,2 +1,0 @@
-var test_max = 9223372036854775807
-print test_max

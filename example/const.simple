@@ -1,5 +1,0 @@
-const ONE = 1
-const HEX = 0xf
-const SIMPLE = 0x4a
-
-print ONE, HEX, SIMPLE
