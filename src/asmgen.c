@@ -436,19 +436,23 @@ void asmGen (struct ast* node) {
 
       if (((struct cond*)node)->tl) {
           asmGen(((struct cond*)node)->tl);
+      }
+      if (((struct cond*)node)->tr) {
           sprintf(buf, "L%u", condBranchNum+1);
           text = genText(text, newJump("jmp", buf));
       }
 
+      text = genText(text, genComment("else"));
       sprintf(buf, "L%u", condBranchNum);
       text = genText(text, newLabel(buf));
 
-      if (((struct cond*)node)->tr)
-          asmGen(((struct cond*)node)->tr);
+      if (((struct cond*)node)->tr) {
+                asmGen(((struct cond*)node)->tr);
+          ++condBranchNum;
+          sprintf(buf, "L%u", condBranchNum);
+          text = genText(text, newLabel(buf));
 
-      ++condBranchNum;
-      sprintf(buf, "L%u", condBranchNum);
-      text = genText(text, newLabel(buf));
+      }
 
       text = genText(text, add("$8", "%rsp"));
 
