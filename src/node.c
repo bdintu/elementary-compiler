@@ -55,6 +55,11 @@ struct ast* newPrint (struct ast *exp, char *str, int nodetype) {
     // else we wants to create print string
     char buf[21];
 
+
+    if (strlen(str) > 255) {
+        yyerror("string len is more 255.");
+    }
+
     // create new string and put into data section
     sprintf(buf, "LC%u", litstrCount);
     data = genData(data, newString(buf, str));
