@@ -1,0 +1,16 @@
+var ay[10]
+
+var ii = 0
+for ii : 10 {
+    ay[ii] = 10 - ii
+}
+
+ii = 0
+for ii : 10 {
+    print "ay["
+    print ii
+    print "]: "
+
+    print ay[ii]
+    print "\n"
+}

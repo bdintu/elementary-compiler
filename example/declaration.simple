@@ -1,0 +1,8 @@
+const cc = 0x4a
+var xx = -64
+
+print cc
+print "\n"
+
+print xx
+print "\n"
