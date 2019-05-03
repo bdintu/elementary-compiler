@@ -131,7 +131,7 @@ void asmGen (struct ast* node) {
       s = lookup(((struct symasgn*)node)->s->name, 0, ((struct symasgn*)node)->is_const);
 
       if (s->offset == 0) {
-        yyerror("%s not define", s->name);
+        yyerror("variable %s not defined", s->name);
         exit(0);
       }
 
@@ -148,7 +148,7 @@ void asmGen (struct ast* node) {
       s = lookup(((struct symarray*)node)->s->name, ((struct symarray*)node)->size, 0);
 
       if (s->offset == 0) {
-        yyerror("%s not define", s->name);
+        yyerror("variable %s not defined", s->name);
         exit(0);
       }
 

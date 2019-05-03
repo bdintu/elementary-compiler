@@ -56,5 +56,8 @@ dkms.conf
 *.tab.h
 *.yy.c
 
+# x86-64 Assembly
+*.s
+
 # Build
 build/

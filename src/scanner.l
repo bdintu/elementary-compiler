@@ -55,7 +55,7 @@
 ["].*["]          { yylval.str = strdup(yytext); return (TEXT); }
 
 \n                {  }
-.                 { errorflag = 1; yyerror("Mystery character %c\n", *yytext); }
+.                 { errorflag = 1; yyerror("unknow character %c\n", *yytext); }
 %%
 
 void comment() {
