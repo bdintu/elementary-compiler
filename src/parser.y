@@ -21,7 +21,7 @@ extern int errorflag;
 %token<sym> VAR
 %token TK_ASSIGN TK_CONST TK_VAR
 %token TK_NEWLINE
-%token TK_IFE TK_VON
+%token TK_IF TK_FOR
 %token TK_PRINT TK_HEX
 
 %right TK_ASSIGN
@@ -47,13 +47,13 @@ program:
 stmt:
   exp 
 |  exp ';'
-| TK_IFE exp TK_EQ exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'e'); }
-| TK_IFE exp TK_NE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'n'); }
-| TK_IFE exp TK_GE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'h'); }
-| TK_IFE exp TK_LE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'm'); }
-| TK_IFE exp TK_GT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'g'); }
-| TK_IFE exp TK_LT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'l'); }
-| TK_VON exp ':' exp '{' block '}'      { $$ = newVon($2, $4, $6); }
+| TK_IF exp TK_EQ exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'e'); }
+| TK_IF exp TK_NE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'n'); }
+| TK_IF exp TK_GE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'h'); }
+| TK_IF exp TK_LE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'm'); }
+| TK_IF exp TK_GT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'g'); }
+| TK_IF exp TK_LT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'l'); }
+| TK_FOR exp ':' exp '{' block '}'      { $$ = newVon($2, $4, $6); }
 ;
 
 exp:

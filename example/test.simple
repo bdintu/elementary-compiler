@@ -1,40 +1,40 @@
-const MI = 9223372036854775807
+const mi = 9223372036854775807
 print "MAX INT: "
-print MI
+print mi
 print "\n"
 
-var IN = -8+0x64/(4/2)
+var in = -8+0x64/(4/2)
 print "-8+0x64/(4/2): "
-print hex(IN)
+print hex(in)
 print "\n"
 
-var FM = 2
-var TO = 0x64
+var fm = 2
+var to = 0x64
 print "Prime number from 1 to "
-print TO
+print to
 print ": "
 
-var PR[25]
-var ID = 0
+var pr[25]
+var id = 0
 
-var PM = 0
-var ST = 2
+var pm = 0
+var st = 2
 
-for FM : TO {
-    PM = 0; ST = 2
-	for ST : FM {
-		if FM % ST == 0 {
-			PM = 1
+for fm : to {
+    pm = 0; st = 2
+	for st : fm {
+		if fm % st == 0 {
+			pm = 1
 		}
 	}
-	if PM == 0 {
-        PR[ID] = FM
-        ID = ID + 1
+	if pm == 0 {
+        pr[id] = fm
+        id = id + 1
 	}
 }
 
-ID = 0
-for ID : 25 {
-    print PR[ID]
+id = 0
+for id : 25 {
+    print pr[id]
     print " "
 }
