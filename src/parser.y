@@ -21,7 +21,7 @@ extern int errorflag;
 %token<sym> VAR
 %token T_ASSIGN T_CONST T_VAR
 %token T_NEWLINE
-%token T_IF T_FOR
+%token T_IF T_ELSE T_FOR
 %token T_PRINT T_HEX
 
 %right T_ASSIGN
@@ -30,7 +30,7 @@ extern int errorflag;
 %left T_EQ T_NE T_GE T_LE T_GT T_LT
 %nonassoc NEG
 
-%type <node> stmt exp term block
+%type <node> stmt exp if term block
 
 %start program
 
@@ -47,14 +47,24 @@ program:
 stmt:
   exp 
 |  exp ';'
-| T_IF exp T_EQ exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'e'); }
-| T_IF exp T_NE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'n'); }
-| T_IF exp T_GE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'h'); }
-| T_IF exp T_LE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'm'); }
-| T_IF exp T_GT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'g'); }
-| T_IF exp T_LT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'l'); }
+| if
 | T_FOR exp ':' exp '{' block '}'      { $$ = newVon($2, $4, $6); }
 ;
+
+if:
+  T_IF exp T_EQ exp '{' block '}'      { $$ = newIfe($2, $4, $6, NULL, 'e'); }
+| T_IF exp T_NE exp '{' block '}'      { $$ = newIfe($2, $4, $6, NULL, 'n'); }
+| T_IF exp T_GE exp '{' block '}'      { $$ = newIfe($2, $4, $6, NULL, 'h'); }
+| T_IF exp T_LE exp '{' block '}'      { $$ = newIfe($2, $4, $6, NULL, 'm'); }
+| T_IF exp T_GT exp '{' block '}'      { $$ = newIfe($2, $4, $6, NULL, 'g'); }
+| T_IF exp T_LT exp '{' block '}'      { $$ = newIfe($2, $4, $6, NULL, 'l'); }
+
+| T_IF exp T_EQ exp '{' block '}' T_ELSE '{' block '}'  { $$ = newIfe($2, $4, $6, $10, 'e'); }
+| T_IF exp T_NE exp '{' block '}' T_ELSE '{' block '}'  { $$ = newIfe($2, $4, $6, $10, 'n'); }
+| T_IF exp T_GE exp '{' block '}' T_ELSE '{' block '}'  { $$ = newIfe($2, $4, $6, $10, 'h'); }
+| T_IF exp T_LE exp '{' block '}' T_ELSE '{' block '}'  { $$ = newIfe($2, $4, $6, $10, 'm'); }
+| T_IF exp T_GT exp '{' block '}' T_ELSE '{' block '}'  { $$ = newIfe($2, $4, $6, $10, 'g'); }
+| T_IF exp T_LT exp '{' block '}' T_ELSE '{' block '}'  { $$ = newIfe($2, $4, $6, $10, 'e'); }
 
 exp:
   term

@@ -46,6 +46,7 @@
 "const"          { return (T_CONST); }
 "var"          { return (T_VAR); }
 "if"             { return (T_IF); }
+"else"             { return (T_ELSE); }
 "for"             { return (T_FOR); }
 
 [-]*[0-9]+           { yylval.num = (int64_t)atol(yytext); return (NUM); }

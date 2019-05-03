@@ -407,7 +407,6 @@ void asmGen (struct ast* node) {
       text = genText(text, cmp("$0", "(%rsp)"));
       sprintf(buf, "L%u", condBranchNum);
 
-
       char op = ((struct cond*)node)->op;
       switch (op) {
           case 'e':
@@ -433,14 +432,24 @@ void asmGen (struct ast* node) {
           case 'm':
             text = genText(text, newJump("jge", buf));
             break;
-
       }
 
-      if (((struct cond*)node)->tl)
+      if (((struct cond*)node)->tl) {
           asmGen(((struct cond*)node)->tl);
+          sprintf(buf, "L%u", condBranchNum+1);
+          text = genText(text, newJump("jmp", buf));
+      }
 
       sprintf(buf, "L%u", condBranchNum);
       text = genText(text, newLabel(buf));
+
+      if (((struct cond*)node)->tr)
+          asmGen(((struct cond*)node)->tr);
+
+      ++condBranchNum;
+      sprintf(buf, "L%u", condBranchNum);
+      text = genText(text, newLabel(buf));
+
       text = genText(text, add("$8", "%rsp"));
 
       break;

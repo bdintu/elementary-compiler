@@ -174,7 +174,7 @@ struct ast* newArrayAssign (struct symbol *s, struct ast* v, struct ast* offset)
 }
 
 // create new condition node
-struct ast* newIfe (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, char op) {
+struct ast* newIfe (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, struct ast* tr, char op) {
   struct cond *tmp = (struct cond*) malloc(sizeof(struct cond));
 
   if (!tmp) {
@@ -186,6 +186,7 @@ struct ast* newIfe (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, 
   tmp->fStmt = firstStmt;
   tmp->sStmt = secStmt;
   tmp->tl = tl;
+  tmp->tr = tr;
   tmp->op = op;
 
   return (struct ast*) tmp;
@@ -269,6 +270,8 @@ void freeNode (struct ast* node) {
 
       if (((struct cond*)node)->tl)
         freeNode(((struct cond*)node)->tl);
+      if (((struct cond*)node)->tr)
+        freeNode(((struct cond*)node)->tr);
 
       break;
 

@@ -38,6 +38,7 @@ struct cond {
     struct ast* fStmt;   /* condition */
     struct ast* sStmt;
     struct ast* tl;     /* then branch or do list */
+    struct ast* tr;     /* then branch or do list */
     char op;
 };
 
@@ -103,7 +104,7 @@ struct ast* newArray (struct symbol *s, uint8_t size);
 struct ast* newAssign (struct symbol *s, struct ast* v);
 struct ast* newArrayAssign (struct symbol *s, struct ast* v, struct ast* offset);
 struct ast* newNum (int64_t num);
-struct ast* newIfe (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, char op);
+struct ast* newIfe (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, struct ast* tr, char op);
 struct ast* newVon (struct ast* from, struct ast* to, struct ast* tl);
 
 
