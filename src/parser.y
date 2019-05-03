@@ -19,15 +19,15 @@ extern int errorflag;
 %token<str> TEXT
 %token<num> NUM
 %token<sym> VAR
-%token TK_ASSIGN TK_CONST TK_VAR
-%token TK_NEWLINE
-%token TK_IF TK_FOR
-%token TK_PRINT TK_HEX
+%token T_ASSIGN T_CONST T_VAR
+%token T_NEWLINE
+%token T_IF T_FOR
+%token T_PRINT T_HEX
 
-%right TK_ASSIGN
+%right T_ASSIGN
 %left '+' '-'
 %left '*' '/' '%'
-%left TK_EQ TK_NE TK_GE TK_LE TK_GT TK_LT
+%left T_EQ T_NE T_GE T_LE T_GT T_LT
 %nonassoc NEG
 
 %type <node> stmt exp term block
@@ -47,23 +47,23 @@ program:
 stmt:
   exp 
 |  exp ';'
-| TK_IF exp TK_EQ exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'e'); }
-| TK_IF exp TK_NE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'n'); }
-| TK_IF exp TK_GE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'h'); }
-| TK_IF exp TK_LE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'm'); }
-| TK_IF exp TK_GT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'g'); }
-| TK_IF exp TK_LT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'l'); }
-| TK_FOR exp ':' exp '{' block '}'      { $$ = newVon($2, $4, $6); }
+| T_IF exp T_EQ exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'e'); }
+| T_IF exp T_NE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'n'); }
+| T_IF exp T_GE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'h'); }
+| T_IF exp T_LE exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'm'); }
+| T_IF exp T_GT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'g'); }
+| T_IF exp T_LT exp '{' block '}'      { $$ = newIfe($2, $4, $6, 'l'); }
+| T_FOR exp ':' exp '{' block '}'      { $$ = newVon($2, $4, $6); }
 ;
 
 exp:
   term
-| TK_CONST VAR TK_ASSIGN exp         { $$ = newDeclar($2, $4, 1); }
-| TK_VAR VAR TK_ASSIGN exp         { $$ = newDeclar($2, $4, 0); }
-| TK_VAR VAR                { $$ = newDeclar($2, NULL, 0); }
-| TK_VAR VAR '[' NUM ']'    { $$ = newArray($2, $4); }
-| VAR TK_ASSIGN exp         { $$ = newAssign($1, $3); }
-| VAR '[' exp ']' TK_ASSIGN exp     { $$ = newArrayAssign($1, $6, $3); }
+| T_CONST VAR T_ASSIGN exp         { $$ = newDeclar($2, $4, 1); }
+| T_VAR VAR T_ASSIGN exp         { $$ = newDeclar($2, $4, 0); }
+| T_VAR VAR                { $$ = newDeclar($2, NULL, 0); }
+| T_VAR VAR '[' NUM ']'    { $$ = newArray($2, $4); }
+| VAR T_ASSIGN exp         { $$ = newAssign($1, $3); }
+| VAR '[' exp ']' T_ASSIGN exp     { $$ = newArrayAssign($1, $6, $3); }
 | exp '+' exp               { $$ = newNode($1, $3, '+'); }
 | exp '-' exp               { $$ = newNode($1, $3, '-'); }
 | exp '*' exp               { $$ = newNode($1, $3, '*'); }
@@ -71,9 +71,9 @@ exp:
 | exp '%' exp               { $$ = newNode($1, $3, '%'); }
 | '^' exp %prec NEG         { $$ = newNode($2, NULL, '^'); }
 | '(' exp ')'               { $$ = $2; }
-| TK_PRINT TEXT               { $$ = newPrintStmt(NULL, $2, 'S'); }
-| TK_PRINT exp                { $$ = newPrintStmt($2, NULL, 'D'); }
-| TK_PRINT TK_HEX '(' exp ')'                { $$ = newPrintStmt($4, NULL, 'H'); }
+| T_PRINT TEXT               { $$ = newPrintStmt(NULL, $2, 'S'); }
+| T_PRINT exp                { $$ = newPrintStmt($2, NULL, 'D'); }
+| T_PRINT T_HEX '(' exp ')'                { $$ = newPrintStmt($4, NULL, 'H'); }
 ;
 
 term:

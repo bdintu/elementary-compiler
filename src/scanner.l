@@ -34,19 +34,19 @@
 ";" |
 ","               { return (yytext[0]); }
 
-"=="          { return (TK_EQ); }
-"!="          { return (TK_NE); }
-">="          { return (TK_GE); }
-"<="          { return (TK_LE); }
-">"          { return (TK_GT); }
-"<"          { return (TK_LT); }
-"="              { return (TK_ASSIGN); }
-"print"          { return (TK_PRINT); }
-"hex"          { return (TK_HEX); }
-"const"          { return (TK_CONST); }
-"var"          { return (TK_VAR); }
-"if"             { return (TK_IF); }
-"for"             { return (TK_FOR); }
+"=="          { return (T_EQ); }
+"!="          { return (T_NE); }
+">="          { return (T_GE); }
+"<="          { return (T_LE); }
+">"          { return (T_GT); }
+"<"          { return (T_LT); }
+"="              { return (T_ASSIGN); }
+"print"          { return (T_PRINT); }
+"hex"          { return (T_HEX); }
+"const"          { return (T_CONST); }
+"var"          { return (T_VAR); }
+"if"             { return (T_IF); }
+"for"             { return (T_FOR); }
 
 [-]*[0-9]+           { yylval.num = (int64_t)atol(yytext); return (NUM); }
 0[xX][0-9a-fA-F]+  { yylval.num = (int64_t)strtol(yytext, NULL, 0); return (NUM);}
