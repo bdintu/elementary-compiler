@@ -49,7 +49,7 @@
 "else"             { return (T_ELSE); }
 "for"             { return (T_FOR); }
 
-[-]*[0-9]+           { yylval.num = (int64_t)atol(yytext); return (NUM); }
+[-]?[0-9]+           { yylval.num = (int64_t)atol(yytext); return (NUM); }
 0[xX][0-9a-fA-F]+  { yylval.num = (int64_t)strtol(yytext, NULL, 0); return (NUM);}
 [a-z]{2}        { yylval.sym = lookup(yytext, 0, 0); return (VAR); }
 ["].*["]          { yylval.str = strdup(yytext); return (TEXT); }
