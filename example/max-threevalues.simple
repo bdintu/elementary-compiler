@@ -1,0 +1,28 @@
+var xx = 9
+var yy = 2
+var zz = 5
+
+print "xx: "
+print xx
+print "\n"
+
+print "yy: "
+print yy
+print "\n"
+
+print "zz: "
+print zz
+print "\n"
+
+var mx = xx
+
+if yy > mx {
+    mx = yy
+}
+
+if zz > mx {
+    mx = zz
+}
+
+print "mx: "
+print mx

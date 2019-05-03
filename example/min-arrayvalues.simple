@@ -1,0 +1,26 @@
+var ay[20]
+
+
+print "print loop mn\n"
+
+var id = 0
+for id : 20 {
+    print "ay["
+    print id
+    print "]: "
+
+    print ay[id]
+    print "\n"
+} 
+
+
+var mn = 0x7fffffffffffffff
+id = 0
+for id : 20 {
+    if mn > ay[id] {
+        mn = ay[id]
+    }
+}
+
+print "mn: "
+print mn
