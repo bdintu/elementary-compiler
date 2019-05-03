@@ -37,7 +37,7 @@ struct ast* newNum (int64_t num) {
 }
 
 // create new print node
-struct ast* newPrintStmt (struct ast *exp, char *str, int nodetype) {
+struct ast* newPrint (struct ast *exp, char *str, int nodetype) {
   struct print *tmp = (struct print*) malloc(sizeof(struct print));
   struct lString *ls = (struct lString*) malloc(sizeof(struct lString));
 
@@ -174,7 +174,7 @@ struct ast* newArrayAssign (struct symbol *s, struct ast* v, struct ast* offset)
 }
 
 // create new condition node
-struct ast* newIfe (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, struct ast* tr, char op) {
+struct ast* newIf (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, struct ast* tr, char op) {
   struct cond *tmp = (struct cond*) malloc(sizeof(struct cond));
 
   if (!tmp) {
@@ -193,7 +193,7 @@ struct ast* newIfe (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, 
 }
 
 // create new loop node
-struct ast* newVon (struct ast* from, struct ast* to, struct ast* tl) {
+struct ast* newFor (struct ast* from, struct ast* to, struct ast* tl) {
   struct loop* tmp = (struct loop*) malloc(sizeof(struct loop));
 
   if (!tmp) {

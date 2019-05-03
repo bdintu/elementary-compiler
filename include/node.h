@@ -96,7 +96,7 @@ struct symarray {
 
 /* build an ast */
 struct ast* newNode (struct ast* l, struct ast* r, int nodetype);
-struct ast* newPrintStmt (struct ast *exp, char *str, int nodetype);
+struct ast* newPrint (struct ast *exp, char *str, int nodetype);
 struct ast* newVar (struct symbol *s);
 struct ast* newVarArray (struct symbol *s, struct ast* v);
 struct ast* newDeclar (struct symbol *s, struct ast* v, uint8_t is_const);
@@ -104,8 +104,8 @@ struct ast* newArray (struct symbol *s, uint8_t size);
 struct ast* newAssign (struct symbol *s, struct ast* v);
 struct ast* newArrayAssign (struct symbol *s, struct ast* v, struct ast* offset);
 struct ast* newNum (int64_t num);
-struct ast* newIfe (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, struct ast* tr, char op);
-struct ast* newVon (struct ast* from, struct ast* to, struct ast* tl);
+struct ast* newIf (struct ast* firstStmt, struct ast* secStmt, struct ast* tl, struct ast* tr, char op);
+struct ast* newFor (struct ast* from, struct ast* to, struct ast* tl);
 
 
 #endif // NODE_INCLUDED
