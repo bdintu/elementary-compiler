@@ -403,9 +403,15 @@ void asmGen (struct ast* node) {
       text = genText(text, sub("(%rsp)", "%rax"));
       text = genText(text, movq("%rax", "(%rsp)"));
       
-      
+
+      int ifBranchNum = condBranchNum;
+      int elseBranchNum = 0;
+      if (((struct cond*)node)->tr) {
+          elseBranchNum = ++condBranchNum;
+      }
+
       text = genText(text, cmp("$0", "(%rsp)"));
-      sprintf(buf, "L%u", condBranchNum);
+      sprintf(buf, "L%u", ifBranchNum);
 
       char op = ((struct cond*)node)->op;
       switch (op) {
@@ -437,21 +443,22 @@ void asmGen (struct ast* node) {
       if (((struct cond*)node)->tl) {
           asmGen(((struct cond*)node)->tl);
       }
+
       if (((struct cond*)node)->tr) {
-          sprintf(buf, "L%u", condBranchNum+1);
+          elseBranchNum = ++condBranchNum;
+          sprintf(buf, "L%u", elseBranchNum);
           text = genText(text, newJump("jmp", buf));
       }
 
-      text = genText(text, genComment("else"));
-      sprintf(buf, "L%u", condBranchNum);
+      text = genText(text, genComment("end if | end else"));
+      sprintf(buf, "L%u", ifBranchNum);
       text = genText(text, newLabel(buf));
 
       if (((struct cond*)node)->tr) {
-                asmGen(((struct cond*)node)->tr);
+          asmGen(((struct cond*)node)->tr);
           ++condBranchNum;
-          sprintf(buf, "L%u", condBranchNum);
+          sprintf(buf, "L%u", elseBranchNum);
           text = genText(text, newLabel(buf));
-
       }
 
       text = genText(text, add("$8", "%rsp"));
