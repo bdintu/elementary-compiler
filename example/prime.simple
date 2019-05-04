@@ -1,0 +1,22 @@
+var fm = 2
+var to = 0x64
+print "Prime number from 2 to "
+print to
+print ": "
+
+var pm = 0
+var st = 2
+
+for fm : to {
+    pm = 0
+    st = 2
+	for st : fm {
+		if fm % st == 0 {
+			pm = 1
+		}
+	}
+	if pm == 0 {
+        print fm
+        print " "
+	}
+}
